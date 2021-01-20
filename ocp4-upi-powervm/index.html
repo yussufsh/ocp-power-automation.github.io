@@ -58,6 +58,11 @@
     <a class="" href="../ocp4-upi-powervs/">Deploying OpenShift on IBM Cloud Power Virtual Servers</a>
 	    </li>
           
+            <li class="toctree-l1">
+		
+    <a class="" href="../openshift-install-power/">Deploying OpenShift on IBM Cloud Power Virtual Servers via Bash Script</a>
+	    </li>
+          
             <li class="toctree-l1 current">
 		
     <a class="current" href="./">Deploying OpenShift on PowerVM managed via PowerVC</a>
@@ -135,14 +140,9 @@
 <p>If you are using standalone PowerVM please take a look at the <a href="https://github.com/RedHatOfficial/ocp4-helpernode/blob/devel/docs/quickstart-powervm.md">following quickstart guide</a>
 which uses the <a href="https://github.com/RedHatOfficial/ocp4-helpernode">ansible playbook</a> to setup a helper node (bastion) for OCP deployment.</p>
 <p>This project also leverages the same ansible playbook internally for OCP deployment on PowerVM LPARs managed via PowerVC.</p>
-<div class="admonition note">
-<p class="admonition-title">Note<p>For bugs/enhancement requests etc. please open a GitHub <a href="https://github.com/ocp-power-automation/ocp4-upi-powervm/issues">issue</a></p>
-</p>
-</div>
-<div class="admonition warning">
-<p class="admonition-title">Warning<p><strong>The <a href="https://github.com/ocp-power-automation/ocp4-upi-powervm/tree/master">main</a> branch must be used with latest OCP pre-release versions only. For stable releases please checkout specific release branches -{<a href="https://github.com/ocp-power-automation/ocp4-upi-powervm/tree/release-4.5">release-4.5</a>, <a href="https://github.com/ocp-power-automation/ocp4-upi-powervm/tree/release-4.6">release-4.6</a> ...} and follow the docs in the specific release branches.</strong></p>
-</p>
-</div>
+<p>:heavy_exclamation_mark: <em>For bugs/enhancement requests etc. please open a GitHub <a href="https://github.com/ocp-power-automation/ocp4-upi-powervm/issues">issue</a></em></p>
+<p>:information_source: <strong>The <a href="https://github.com/ocp-power-automation/ocp4-upi-powervm/tree/master">main</a> branch must be used with latest OCP pre-release versions only. For stable releases please checkout specific release branches -
+{<a href="https://github.com/ocp-power-automation/ocp4-upi-powervm/tree/release-4.5">release-4.5</a>, <a href="https://github.com/ocp-power-automation/ocp4-upi-powervm/tree/release-4.6">release-4.6</a> ...} and follow the docs in the specific release branches.</strong></p>
 <h2 id="automation-host-prerequisites">Automation Host Prerequisites</h2>
 <p>The automation needs to run from a system with internet access. This could be your laptop or a VM with public internet connectivity. This automation code has been tested on the following 64-bit Operating Systems:
 - Mac OSX (Darwin)
@@ -153,7 +153,7 @@ which uses the <a href="https://github.com/RedHatOfficial/ocp4-helpernode">ansib
 <h2 id="ocp-install">OCP Install</h2>
 <p>Follow the <a href="docs/quickstart/">quickstart</a> guide for OCP installation on PowerVM LPARs managed via PowerVC</p>
 <h2 id="contributing">Contributing</h2>
-<p>Please see the <a href="CONTRIBUTING/">contributing doc</a> for more details.
+<p>Please see the <a href="https://github.com/ocp-power-automation/ocp4-upi-powervm/blob/master/CONTRIBUTING.md">contributing doc</a> for more details.
 PRs are most welcome !!</p>
               
             </div>
@@ -165,7 +165,7 @@ PRs are most welcome !!</p>
         <a href="../ocp4-upi-kvm/" class="btn btn-neutral float-right" title="Deploying OpenShift on KVM">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../ocp4-upi-powervs/" class="btn btn-neutral" title="Deploying OpenShift on IBM Cloud Power Virtual Servers"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../openshift-install-power/" class="btn btn-neutral" title="Deploying OpenShift on IBM Cloud Power Virtual Servers via Bash Script"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -191,7 +191,7 @@ PRs are most welcome !!</p>
     <span class="rst-current-version" data-toggle="rst-current-version">
       
       
-        <span><a href="../ocp4-upi-powervs/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../openshift-install-power/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
         <span style="margin-left: 15px"><a href="../ocp4-upi-kvm/" style="color: #fcfcfc">Next &raquo;</a></span>
@@ -207,5 +207,5 @@ PRs are most welcome !!</p>
 
 <!--
 MkDocs version : 1.0.4
-Build Date UTC : 2020-12-02 12:55:52
+Build Date UTC : 2021-01-20 14:48:55
 -->
