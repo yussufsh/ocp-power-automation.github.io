@@ -184,7 +184,7 @@ EOF
 }
 
 resource "null_resource" "bastion_register" {
-    count       = var.rhel_subscription_username == "" || var.rhel_subscription_username  == "<subscription-id>" ? 0 : local.bastion_count
+    count       = ( var.rhel_subscription_username == "" || var.rhel_subscription_username  == "<subscription-id>" ) && var.rhel_subscription_org == "" ? 0 : local.bastion_count
     depends_on  = [null_resource.bastion_init, null_resource.setup_proxy_info]
     triggers = {
         external_ip     = data.ibm_pi_instance_ip.bastion_public_ip[count.index].external_ip
@@ -208,7 +208,11 @@ resource "null_resource" "bastion_register" {
 # Give some more time to subscription-manager
 sudo subscription-manager config --server.server_timeout=600
 sudo subscription-manager clean
-sudo subscription-manager register --username='${var.rhel_subscription_username}' --password='${var.rhel_subscription_password}' --force
+if [[ '${var.rhel_subscription_username}' != '' && '${var.rhel_subscription_username}' != '<subscription-id>' ]]; then 
+    sudo subscription-manager register --username='${var.rhel_subscription_username}' --password='${var.rhel_subscription_password}' --force
+else
+    sudo subscription-manager register --org='${var.rhel_subscription_org}' --activationkey='${var.rhel_subscription_activationkey}' --force
+fi
 sudo subscription-manager refresh
 sudo subscription-manager attach --auto
 EOF
@@ -238,9 +242,35 @@ EOF
     }
 }
 
-resource "null_resource" "bastion_packages" {
+resource "null_resource" "enable_repos" {
     count           = local.bastion_count
     depends_on      = [null_resource.bastion_init, null_resource.setup_proxy_info, null_resource.bastion_register]
+
+    connection {
+        type        = "ssh"
+        user        = var.rhel_username
+        host        = data.ibm_pi_instance_ip.bastion_public_ip[count.index].external_ip
+        private_key = var.private_key
+        agent       = var.ssh_agent
+        timeout     = "15m"
+    }
+
+    provisioner "remote-exec" {
+        inline = [<<EOF
+# Additional repo for installing ansible package
+if ( [[ -z "${var.rhel_subscription_username}" ]] || [[ "${var.rhel_subscription_username}" == "<subscription-id>" ]] ) && [[ -z "${var.rhel_subscription_org}" ]]; then
+  sudo yum install -y epel-release
+else
+  sudo subscription-manager repos --enable ${var.ansible_repo_name}
+fi
+EOF
+        ]
+    }
+}
+
+resource "null_resource" "bastion_packages" {
+    count           = local.bastion_count
+    depends_on      = [null_resource.bastion_init, null_resource.setup_proxy_info, null_resource.bastion_register, null_resource.enable_repos]
 
     connection {
         type        = "ssh"
@@ -259,16 +289,16 @@ resource "null_resource" "bastion_packages" {
     }
     provisioner "remote-exec" {
         inline = [
-            "pip3 install ansible -q"
-        ]
-    }
-    provisioner "remote-exec" {
-        inline = [
             "sudo systemctl unmask NetworkManager",
             "sudo systemctl start NetworkManager",
             "for i in $(nmcli device | grep unmanaged | awk '{print $1}'); do echo NM_CONTROLLED=yes | sudo tee -a /etc/sysconfig/network-scripts/ifcfg-$i; done",
             "sudo systemctl restart NetworkManager",
             "sudo systemctl enable NetworkManager"
+        ]
+    }
+    provisioner "remote-exec" {
+        inline = [
+           "sudo yum install -y ansible"
         ]
     }
 }
@@ -307,6 +337,26 @@ resource "null_resource" "setup_nfs_disk" {
             "sudo mkfs.ext4 -F /dev/${local.disk_config.disk_name}",
             "echo '/dev/${local.disk_config.disk_name} ${local.storage_path} ext4 defaults 0 0' | sudo tee -a /etc/fstab > /dev/null",
             "sudo mount ${local.storage_path}",
+        ]
+    }
+}
+
+# Workaround for unable to access RHEL 8.3 instance after reboot. TODO: Remove when permanently fixed.
+resource "null_resource" "rhel83_fix" {
+    count           = local.bastion_count
+    depends_on      = [null_resource.bastion_packages,null_resource.setup_nfs_disk]
+
+    connection {
+        type        = "ssh"
+        user        = var.rhel_username
+        host        = data.ibm_pi_instance_ip.bastion_public_ip[count.index].external_ip
+        private_key = var.private_key
+        agent       = var.ssh_agent
+        timeout     = "15m"
+    }
+    provisioner "remote-exec" {
+        inline = [
+            "sudo yum remove cloud-init --noautoremove -y",
         ]
     }
 }

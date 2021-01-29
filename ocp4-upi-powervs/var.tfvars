@@ -13,11 +13,11 @@ service_instance_id         = "<cloud_instance_ID>"
 ### Example 1.5 processors == 1.5 physical core entitlements == ceil[1.5] = 2 vCPU == 16 logical OS CPUs (SMT=8)
 ### Example 2 processors == 2 physical core entitlements == ceil[2] = 2 vCPU == 16 logical OS CPUs (SMT=8)
 bastion                     = {memory      = "16",   processors  = "1",    "count"   = 1}
-bootstrap                   = {memory      = "16",   processors  = "0.5",  "count"   = 1}
-master                      = {memory      = "16",   processors  = "0.5",  "count"   = 3}
+bootstrap                   = {memory      = "32",   processors  = "0.5",  "count"   = 1}
+master                      = {memory      = "32",   processors  = "0.5",  "count"   = 3}
 worker                      = {memory      = "32",   processors  = "0.5",  "count"   = 2}
 
-rhel_image_name             = "rhel-8.2"
+rhel_image_name             = "rhel-8.3"
 rhcos_image_name            = "rhcos-4.6"
 processor_type              = "shared"
 system_type                 = "s922"
@@ -28,8 +28,9 @@ public_key_file             = "data/id_rsa.pub"
 private_key_file            = "data/id_rsa"
 rhel_subscription_username  = "<subscription-id>"          #Leave this as-is if using CentOS as bastion image
 rhel_subscription_password  = "<subscription-password>"    #Leave this as-is if using CentOS as bastion image
+rhel_subscription_org           = ""                       # Define it only when using activationkey for RHEL subscription
+rhel_subscription_activationkey = ""                       # Define it only when using activationkey for RHEL subscription
 rhel_smt                    = 4
-
 
 ### OpenShift Installation Details
 
@@ -58,6 +59,7 @@ cluster_id                  = ""
 
 #installer_log_level        = "info"
 #ansible_extra_options      = "-v"
+#ansible_repo_name          = "ansible-2.9-for-rhel-8-ppc64le-rpms"
 #dns_forwarders             = "1.1.1.1; 9.9.9.9"
 #rhcos_kernel_options       = []
 #chrony_config              = true
@@ -77,8 +79,8 @@ cluster_id                  = ""
 #master_volume_size         = "500"   #Value in GB
 #worker_volume_size         = "500"   #Value in GB
 
-#upgrade_image              = ""
-#upgrade_pause_time         = "90"
+#upgrade_version            = ""
+#upgrade_pause_time         = "70"
 #upgrade_delay_time         = "600"
 
 #ibm_cloud_dl_endpoint_net_cidr = ""  #Set this to IBM Cloud DirectLink endpoint network cidr eg. 10.0.0.0/8

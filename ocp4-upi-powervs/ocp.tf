@@ -35,6 +35,9 @@ module "prepare" {
     ssh_agent                       = var.ssh_agent
     rhel_subscription_username      = var.rhel_subscription_username
     rhel_subscription_password      = var.rhel_subscription_password
+    rhel_subscription_org           = var.rhel_subscription_org
+    rhel_subscription_activationkey = var.rhel_subscription_activationkey
+    ansible_repo_name               = var.ansible_repo_name
     rhel_smt                        = var.rhel_smt
     storage_type                    = local.storage_type
     volume_type                     = var.volume_type
@@ -62,6 +65,10 @@ module "nodes" {
     worker_volume_size              = var.worker_volume_size
     volume_type                     = var.volume_type
     volume_shareable                = var.volume_shareable
+    bastion_public_ip               = module.prepare.bastion_public_ip
+    rhel_username                   = var.rhel_username
+    private_key                     = local.private_key
+    ssh_agent                       = var.ssh_agent
 }
 
 module "install" {
@@ -110,7 +117,7 @@ module "install" {
     rhcos_kernel_options            = var.rhcos_kernel_options
     chrony_config                   = var.chrony_config
     chrony_config_servers           = var.chrony_config_servers
-    upgrade_image                   = var.upgrade_image
+    upgrade_version                 = var.upgrade_version
     upgrade_pause_time              = var.upgrade_pause_time
     upgrade_delay_time              = var.upgrade_delay_time
     ibm_cloud_dl_endpoint_net_cidr  = var.ibm_cloud_dl_endpoint_net_cidr

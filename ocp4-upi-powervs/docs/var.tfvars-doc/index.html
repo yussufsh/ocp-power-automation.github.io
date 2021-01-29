@@ -150,15 +150,44 @@ service_instance_id = &quot;abc123xyzaaaa&quot;
 <td>eu-de-1</td>
 </tr>
 <tr>
+<td>eu-de</td>
+<td>eu-de-2</td>
+</tr>
+<tr>
+<td>dal</td>
+<td>dal12</td>
+</tr>
+<tr>
 <td>lon</td>
-<td>lon0</td>
+<td>lon04</td>
+</tr>
+<tr>
+<td>lon</td>
+<td>lon06</td>
+</tr>
+<tr>
+<td>syd</td>
+<td>syd04</td>
+</tr>
+<tr>
+<td>sao</td>
+<td>sao01</td>
 </tr>
 <tr>
 <td>tor</td>
 <td>tor01</td>
 </tr>
+<tr>
+<td>tok</td>
+<td>tok04</td>
+</tr>
+<tr>
+<td>us-east</td>
+<td>us-east</td>
+</tr>
 </tbody>
 </table>
+<p>NOTE:  us-east is Washington, DC datacenter.</p>
 <p>Tieing all these, the values to be used will be as shown below:
    <code>ibmcloud_region     = eu-de
    ibmcloud_zone       = eu-de-1
@@ -168,14 +197,14 @@ service_instance_id = &quot;abc123xyzaaaa&quot;
 <p>Change the values as per your requirement.
 The defaults (recommended config) should suffice for most of the common use-cases.</p>
 <pre><code>bastion     = {memory      = &quot;16&quot;,   processors  = &quot;1&quot;,    &quot;count&quot;   = 1}
-bootstrap   = {memory      = &quot;16&quot;,   processors  = &quot;0.5&quot;,  &quot;count&quot;   = 1}
-master      = {memory      = &quot;16&quot;,   processors  = &quot;0.5&quot;,  &quot;count&quot;   = 3}
+bootstrap   = {memory      = &quot;32&quot;,   processors  = &quot;0.5&quot;,  &quot;count&quot;   = 1}
+master      = {memory      = &quot;32&quot;,   processors  = &quot;0.5&quot;,  &quot;count&quot;   = 3}
 worker      = {memory      = &quot;32&quot;,   processors  = &quot;0.5&quot;,  &quot;count&quot;   = 2}
 </code></pre>
 <p><code>memory</code> is in <code>GBs</code> and <code>count</code> specifies the number of VMs that should be created for each type.</p>
-<p>To enable high availability (HA) for cluster services running on the bastion set the bastion <code>count</code> value to 2. 
+<p>To enable high availability (HA) for cluster services running on the bastion set the bastion <code>count</code> value to 2.
 Note that in case of HA, the automation will not setup NFS storage. <code>count</code> of 1 for bastion implies the default non-HA bastion setup.</p>
-<p>You can optionally set the worker <code>count</code> value to 0 in which case all the cluster pods will be running on the master/supervisor nodes. 
+<p>You can optionally set the worker <code>count</code> value to 0 in which case all the cluster pods will be running on the master/supervisor nodes.
 Ensure you use proper sizing for master/supervisor nodes to avoid resource starvation for containers.</p>
 <p>For PowerVS processors are equal to entitled physical count. So <strong>N</strong> processors == <strong>N</strong> physical core entitlements == <strong>ceil[N]</strong> vCPUs.
 Here are some examples to help you understand the relationship.</p>
@@ -211,11 +240,15 @@ private_key_file            = &quot;data/id_rsa&quot;
 - Mac OSX - https://www.techrepublic.com/article/how-to-generate-ssh-keys-on-macos-mojave/
 - Linux - https://www.siteground.com/kb/generate_ssh_key_in_linux/</p>
 <p>Create the SSH key-pair and keep it under the <code>data</code> directory</p>
-<p>These set of variables specify the RHEL subscription details.
+<p>These set of variables specify the RHEL subscription details, RHEL subscription supports two methods: one is using username and password, the other is using activation key.
 This is sensitive data, and if you don't want to save it on disk, use environment variables <code>RHEL_SUBS_USERNAME</code> and <code>RHEL_SUBS_PASSWORD</code> and pass them to <code>terraform apply</code> command as shown in the <a href="../quickstart/#setup-terraform-variables">Quickstart guide</a>.
 If you are using CentOS as the bastion image, then leave these variables as-is.</p>
 <pre><code>rhel_subscription_username  = &quot;user@test.com&quot;
 rhel_subscription_password  = &quot;mypassword&quot;
+</code></pre>
+<p>Or define following variables to use activation key for RHEL subscription:</p>
+<pre><code>rhel_subscription_org = &quot;org-id&quot;
+rhel_subscription_activationkey = &quot;activation-key&quot;
 </code></pre>
 <p>This variable specifies the number of hardware threads (SMT) that's used for the bastion node.
 Default setting should be fine for majority of the use-cases.</p>
@@ -261,9 +294,12 @@ helpernode_tag             = &quot;5eab3db53976bb16be582f2edc2de02f7510050d&quot
 install_playbook_repo      = &quot;https://github.com/ocp-power-automation/ocp4-playbooks&quot;
 install_playbook_tag       = &quot;02a598faa332aa2c3d53e8edd0e840440ff74bd5&quot;
 </code></pre>
-<p>These variables can be used when debugging ansible playbooks</p>
+<p>These variables can be used when debugging ansible playbooks.</p>
 <pre><code>installer_log_level         = &quot;info&quot;
 ansible_extra_options       = &quot;-v&quot;
+</code></pre>
+<p>This variable can be used to change the repository name for installing ansible package on RHEL.</p>
+<pre><code>ansible_repo_name           = &quot;ansible-2.9-for-rhel-8-ppc64le-rpms&quot;
 </code></pre>
 <p>This variable specifies the external DNS servers to forward DNS queries that cannot be resolved locally.</p>
 <pre><code>dns_forwarders              = &quot;1.1.1.1; 9.9.9.9&quot;
@@ -300,8 +336,8 @@ volume_shareable            = false
 worker_volume_size          = &quot;500&quot;
 </code></pre>
 <p>The following variables are specific to upgrading an existing installation.</p>
-<pre><code>upgrade_image = &quot;&quot;
-upgrade_pause_time = &quot;90&quot;
+<pre><code>upgrade_version    = &quot;&quot;
+upgrade_pause_time = &quot;70&quot;
 upgrade_delay_time = &quot;600&quot;
 </code></pre>
 <p>The following variables are specific to enable the connectivity between OCP nodes in PowerVS and IBM Cloud infrastructure over DirectLink.</p>

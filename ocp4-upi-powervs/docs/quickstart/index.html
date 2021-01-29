@@ -219,29 +219,23 @@ worker_ips = [
 <li>
 <p><strong>Add entries to your DNS server</strong></p>
 <p>The general format is shown below:
-<code>api.&lt;cluster_id&gt;.  IN  A  &lt;bastion_public_ip&gt;
-*.apps.&lt;cluster_id&gt;.  IN  A  &lt;bastion_public_ip&gt;</code>
-You'll need <code>bastion_public_ip</code> and <code>cluster_id</code>. This is printed at the end of a successful install. Or you can retrieve it anytime by running <code>terraform output</code> from the install directory.
-For example, if <code>bastion_public_ip = 16.20.34.5</code> and <code>cluster_id = test-cluster-9a4f</code> then the following DNS records will need to be added.
-<code>api.test-cluster-9a4f.  IN  A  16.20.34.5
-*.apps.test-cluster-9a4f.  IN  A  16.20.34.5</code></p>
+<code>api.&lt;cluster_id&gt;.&lt;cluster_domain&gt;.  IN  A  &lt;bastion_address&gt;
+*.apps.&lt;cluster_id&gt;.&lt;cluster_domain&gt;.  IN  A  &lt;bastion_address&gt;</code>
+You’ll need <code>dns_entries</code>. This is printed at the end of a successful install.
+Alternatively, you can retrieve it anytime by running <code>terraform output dns_entries</code> from the install directory.
+An example <code>dns_entries</code> output:
+<code>api.test-cluster-9a4f.mydomain.com.  IN  A  16.20.34.5
+*.apps.test-cluster-9a4f.mydomain.com.  IN  A  16.20.34.5</code></p>
 </li>
 <li>
 <p><strong>Add entries to your client system <code>hosts</code> file</strong></p>
 <p>For Linux and Mac <code>hosts</code> file is located at <code>/etc/hosts</code> and for Windows it's located at <code>c:\Windows\System32\Drivers\etc\hosts</code>.</p>
 <p>The general format is shown below:
-<code>&lt;bastion_public_ip&gt; api.&lt;cluster_id&gt;
-&lt;bastion_public_ip&gt; console-openshift-console.apps.&lt;cluster_id&gt;
-&lt;bastion_public_ip&gt; integrated-oauth-server-openshift-authentication.apps.&lt;cluster_id&gt;
-&lt;bastion_public_ip&gt; oauth-openshift.apps.&lt;cluster_id&gt;
-&lt;bastion_public_ip&gt; prometheus-k8s-openshift-monitoring.apps.&lt;cluster_id&gt;
-&lt;bastion_public_ip&gt; grafana-openshift-monitoring.apps.&lt;cluster_id&gt;
-&lt;bastion_public_ip&gt; &lt;app name&gt;.apps.&lt;cluster_id&gt;</code></p>
+<code>&lt;bastion_address&gt; api.&lt;cluster_id&gt;.&lt;cluster_domain&gt; console-openshift-console.apps.&lt;cluster_id&gt;.&lt;cluster_domain&gt; integrated-oauth-server-openshift-authentication.apps.&lt;cluster_id&gt;.&lt;cluster_domain&gt; oauth-openshift.apps.&lt;cluster_id&gt;.&lt;cluster_domain&gt; prometheus-k8s-openshift-monitoring.apps.&lt;cluster_id&gt;.&lt;cluster_domain&gt; grafana-openshift-monitoring.apps.&lt;cluster_id&gt;.&lt;cluster_domain&gt; &lt;app name&gt;.apps.&lt;cluster_id&gt;.&lt;cluster_domain&gt;</code></p>
 <p>You'll need <code>etc_host_entries</code>. This is printed at the end of a successful install.
-Alternatively you can retrieve it anytime by running <code>terraform output</code> from the install directory.</p>
+Alternatively you can retrieve it anytime by running <code>terraform output etc_hosts_entries</code> from the install directory.</p>
 <p>As an example, for the following <code>etc_hosts_entries</code>
-<code>etc_hosts_entries =
-16.20.34.5 api.test-cluster-9a4f.mydomain.com console-openshift-console.apps.test-cluster-9a4f.mydomain.com integrated-oauth-server-openshift-authentication.apps.test-cluster-9a4f.mydomain.com oauth-openshift.apps.test-cluster-9a4f.mydomain.com prometheus-k8s-openshift-monitoring.apps.test-cluster-9a4f.mydomain.com grafana-openshift-monitoring.apps.test-cluster-9a4f.mydomain.com example.apps.test-cluster-9a4f.mydomain.com</code>
+<code>16.20.34.5 api.test-cluster-9a4f.mydomain.com console-openshift-console.apps.test-cluster-9a4f.mydomain.com integrated-oauth-server-openshift-authentication.apps.test-cluster-9a4f.mydomain.com oauth-openshift.apps.test-cluster-9a4f.mydomain.com prometheus-k8s-openshift-monitoring.apps.test-cluster-9a4f.mydomain.com grafana-openshift-monitoring.apps.test-cluster-9a4f.mydomain.com example.apps.test-cluster-9a4f.mydomain.com</code>
 just add the following entry to the <code>hosts</code> file
 ```
 [existing entries in hosts file]</p>
@@ -270,17 +264,15 @@ cluster_authentication_details = Cluster authentication details are available in
 <h3 id="using-cli">Using CLI</h3>
 <p>OpenShift CLI <code>oc</code> can be downloaded from the following links. Use the one specific to your client system architecture.</p>
 <ul>
-<li><a href="https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/oc/4.5/macosx/oc.tar.gz">Mac OSX</a></li>
-<li><a href="https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/oc/4.5/linux/oc.tar.gz">Linux (x86_64)</a></li>
-<li><a href="https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/oc/4.5/windows/oc.zip">Windows</a></li>
+<li><a href="https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/latest/openshift-client-mac.tar.gz">Mac OSX</a></li>
+<li><a href="https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/latest/openshift-client-linux.tar.gz">Linux (x86_64)</a></li>
+<li><a href="https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/latest/openshift-client-windows.zip">Windows</a></li>
 </ul>
 <p>Download the specific file, extract it and place the binary in a directory that is on your <code>PATH</code>
-For more details check the following <a href="https://docs.openshift.com/container-platform/4.5/cli_reference/openshift_cli/getting-started-cli.html">link</a></p>
+For more details check the following <a href="https://docs.openshift.com/container-platform/4.6/cli_reference/openshift_cli/getting-started-cli.html">link</a></p>
 <p>The CLI login URL <code>oc_server_url</code> will be printed at the end of successful install.
-Alternatively you can retrieve it anytime by running <code>terraform output</code> from the install directory.</p>
-<pre><code>[...]
-oc_server_url = https://test-cluster-9a4f.mydomain.com:6443
-[...]
+Alternatively you can retrieve it anytime by running <code>terraform output oc_server_url</code> from the install directory.</p>
+<pre><code>https://test-cluster-9a4f.mydomain.com:6443
 </code></pre>
 <p>In order to login the cluster you can use the <code>oc login &lt;oc_server_url&gt; -u kubeadmin -p &lt;kubeadmin-password&gt;</code>
 Example:</p>
@@ -295,21 +287,19 @@ To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'
 
 $ oc get nodes
 NAME       STATUS   ROLES    AGE   VERSION
-master-0   Ready    master   13h   v1.18.3+b74c5ed
-master-1   Ready    master   13h   v1.18.3+b74c5ed
-master-2   Ready    master   13h   v1.18.3+b74c5ed
-worker-0   Ready    worker   13h   v1.18.3+b74c5ed
-worker-1   Ready    worker   13h   v1.18.3+b74c5ed
+master-0   Ready    master   11h   v1.19.0+43983cd
+master-1   Ready    master   11h   v1.19.0+43983cd
+master-2   Ready    master   11h   v1.19.0+43983cd
+worker-0   Ready    worker   11h   v1.19.0+43983cd
+worker-1   Ready    worker   11h   v1.19.0+43983cd
 </code></pre>
 <blockquote>
 <p><strong>Note:</strong> The OpenShift command-line client <code>oc</code> is already configured on the bastion node with kubeconfig placed at <code>~/.kube/config</code>.</p>
 </blockquote>
 <h3 id="using-web-ui">Using Web UI</h3>
 <p>The web console URL will be printed at the end of a successful install.
-Alternatively you can retrieve it anytime by running <code>terraform output</code> from the install directory.</p>
-<pre><code>[...]
-web_console_url = https://console-openshift-console.apps.test-cluster-9a4f.mydomain.com
-[...]
+Alternatively you can retrieve it anytime by running <code>terraform output web_console_url</code> from the install directory.</p>
+<pre><code>https://console-openshift-console.apps.test-cluster-9a4f.mydomain.com
 </code></pre>
 <p>Open this URL in your browser and login with user <code>kubeadmin</code> and password mentioned in the <code>kubeadmin-password</code> file.</p>
 <h2 id="clean-up">Clean up</h2>

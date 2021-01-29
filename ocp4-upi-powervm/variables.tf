@@ -65,6 +65,8 @@ variable "bastion" {
     default = {
         instance_type   = "m1.xlarge"
         image_id        = "daa5d3f4-ab66-4b2d-9f3d-77bd61774419"
+        # optional fixed IP address
+        # fixed_ip_v4   = "123.45.67.89"
     }
 }
 variable "bootstrap" {
@@ -229,7 +231,7 @@ variable "install_playbook_repo" {
 variable "install_playbook_tag" {
     description = "Set the branch/tag name or commit# for using ocp4-playbooks repo"
     # Checkout level for https://github.com/ocp-power-automation/ocp4-playbooks which is used for running ocp4 installations steps
-    default = "c6e6038dba0856e621697c876bd3a65927f46166"
+    default = "eeabfb1c83a4ecc8980dd09261a3a849cb4448fb"
 }
 
 variable "ansible_extra_options" {
@@ -328,6 +330,11 @@ variable "upgrade_version" {
 
 variable "upgrade_channel" {
     description = "Upgrade channel having required version availble for cluster upgrade (stable-4.x, fast-4.x, candidate-4.x) eg. stable-4.5"
+    default = ""
+}
+
+variable "upgrade_image" {
+    description = "OCP upgrade image e.g. quay.io/openshift-release-dev/ocp-release-nightly@sha256:xxxxx"
     default = ""
 }
 
