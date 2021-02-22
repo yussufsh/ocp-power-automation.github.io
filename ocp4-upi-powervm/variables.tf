@@ -155,6 +155,13 @@ variable "rhel_subscription_password" {
     default = ""
 }
 
+variable "rhel_subscription_org" {
+    default = ""
+}
+
+variable "rhel_subscription_activationkey" {
+    default = ""
+}
 variable "rhcos_kernel_options" {
     description = "List of kernel arguments for the cluster nodes"
     default     = []
@@ -219,7 +226,7 @@ variable "helpernode_repo" {
 variable "helpernode_tag" {
     description = "Set the branch/tag name or commit# for using ocp4-helpernode repo"
     # Checkout level for https://github.com/RedHatOfficial/ocp4-helpernode which is used for setting up services required on bastion node
-    default = "dd8a0767c677fc862e45b6d70e5d04656ced5d28"
+    default = "1ac7f276b537cd734240eda9ed554a254ba80629"
 }
 
 variable "install_playbook_repo" {
@@ -231,12 +238,16 @@ variable "install_playbook_repo" {
 variable "install_playbook_tag" {
     description = "Set the branch/tag name or commit# for using ocp4-playbooks repo"
     # Checkout level for https://github.com/ocp-power-automation/ocp4-playbooks which is used for running ocp4 installations steps
-    default = "eeabfb1c83a4ecc8980dd09261a3a849cb4448fb"
+    default = "592e51671ff2762718955fb2a0541a5b19c862e9"
 }
 
 variable "ansible_extra_options" {
     description = "Extra options string to append to ansible-playbook commands"
     default     = "-v"
+}
+
+variable "ansible_repo_name" {
+    default = "ansible-2.9-for-rhel-8-ppc64le-rpms"
 }
 
 locals {
@@ -346,6 +357,11 @@ variable "upgrade_pause_time" {
 variable "upgrade_delay_time" {
     description = "Number of seconds to wait before re-checking the upgrade status once the playbook execution resumes."
     default = "600"
+}
+
+variable "cni_network_provider" {
+    description = "Set the default Container Network Interface (CNI) network provider"
+    default = "OpenshiftSDN"
 }
 
 ################################################################

@@ -73,6 +73,11 @@
     <a class="" href="../../../ocp4-upi-kvm/">Deploying OpenShift on KVM</a>
 	    </li>
           
+            <li class="toctree-l1">
+		
+    <a class="" href="../../../ocp-powervm-faq/docs/powervs-faq/">FAQ for OpenShift on IBM Cloud Power Virtual Servers</a>
+	    </li>
+          
         </ul>
       </div>
       &nbsp;
@@ -143,6 +148,13 @@ $ set -o history
 <pre><code>$ terraform init
 $ terraform apply -var-file var.tfvars -parallelism=3
 </code></pre>
+<p>If using template flavors for nodes configuration, then do the following.</p>
+<pre><code>$ terraform init
+$ terraform apply -var-file var.tfvars -var-file compute-vars/&lt;flavor-type&gt;.tfvars
+</code></pre>
+<blockquote>
+<p>Here, <flavor-type> is the node configuration template name. By default, <code>medium</code> flavor type is specified.</p>
+</blockquote>
 <p>If using environment variables for sensitive data, then do the following, instead.</p>
 <pre><code>$ terraform init
 $ terraform apply -var-file var.tfvars -parallelism=3 -var ibmcloud_api_key=&quot;$IBMCLOUD_API_KEY&quot; -var rhel_subscription_username=&quot;$RHEL_SUBS_USERNAME&quot; -var rhel_subscription_password=&quot;$RHEL_SUBS_PASSWORD&quot;

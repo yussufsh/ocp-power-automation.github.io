@@ -73,6 +73,11 @@
     <a class="" href="../../../ocp4-upi-kvm/">Deploying OpenShift on KVM</a>
 	    </li>
           
+            <li class="toctree-l1">
+		
+    <a class="" href="../../../ocp-powervm-faq/docs/powervs-faq/">FAQ for OpenShift on IBM Cloud Power Virtual Servers</a>
+	    </li>
+          
         </ul>
       </div>
       &nbsp;
@@ -201,6 +206,11 @@ bootstrap   = {memory      = &quot;32&quot;,   processors  = &quot;0.5&quot;,  &
 master      = {memory      = &quot;32&quot;,   processors  = &quot;0.5&quot;,  &quot;count&quot;   = 3}
 worker      = {memory      = &quot;32&quot;,   processors  = &quot;0.5&quot;,  &quot;count&quot;   = 2}
 </code></pre>
+<p>You can also choose one of the default node configuration templates that are stored in the <code>compute-vars</code> directory, as per your requirements.
+The default flavors present under the compute-vars folder:
+   <code>small.tfvars
+   medium.tfvars
+   large.tfvars</code></p>
 <p><code>memory</code> is in <code>GBs</code> and <code>count</code> specifies the number of VMs that should be created for each type.</p>
 <p>To enable high availability (HA) for cluster services running on the bastion set the bastion <code>count</code> value to 2.
 Note that in case of HA, the automation will not setup NFS storage. <code>count</code> of 1 for bastion implies the default non-HA bastion setup.</p>

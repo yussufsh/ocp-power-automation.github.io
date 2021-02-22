@@ -57,6 +57,9 @@ module "bastion" {
     jump_host                       = var.jump_host
     rhel_subscription_username      = var.rhel_subscription_username
     rhel_subscription_password      = var.rhel_subscription_password
+    rhel_subscription_org           = var.rhel_subscription_org
+    rhel_subscription_activationkey = var.rhel_subscription_activationkey
+    ansible_repo_name               = var.ansible_repo_name
     storage_type                    = var.storage_type
     volume_size                     = var.volume_size
     volume_storage_template         = var.volume_storage_template
@@ -69,13 +72,13 @@ module "network" {
 
     cluster_id                      = local.cluster_id
     network_name                    = var.network_name
+    bootstrap_count                 = var.bootstrap["count"]
     master_count                    = var.master["count"]
     worker_count                    = var.worker["count"]
     network_type                    = var.network_type
 }
 
 module "helpernode" {
-    depends_on                      = [module.bastion]
     source                          = "./modules/3_helpernode"
 
     cluster_domain                  = var.cluster_domain
@@ -109,7 +112,6 @@ module "helpernode" {
 }
 
 module "nodes" {
-    depends_on                      = [module.helpernode]
     source                          = "./modules/4_nodes"
 
     bastion_ip                      = module.bastion.bastion_ip
@@ -123,10 +125,15 @@ module "nodes" {
     master_port_ids                 = module.network.master_port_ids
     worker_port_ids                 = module.network.worker_port_ids
     mount_etcd_ramdisk              = var.mount_etcd_ramdisk
+    rhel_username                   = var.rhel_username
+    private_key                     = local.private_key
+    ssh_agent                       = var.ssh_agent
+    connection_timeout              = var.connection_timeout
+    jump_host                       = var.jump_host
 }
 
 module "install" {
-    depends_on                      = [module.nodes]
+    depends_on                      = [module.helpernode, module.nodes]
     source                          = "./modules/5_install"
 
     cluster_domain                  = var.cluster_domain
@@ -165,4 +172,5 @@ module "install" {
     upgrade_delay_time              = var.upgrade_delay_time
     chrony_config                   = var.chrony_config
     chrony_config_servers           = var.chrony_config_servers
+    cni_network_provider            = var.cni_network_provider
 }
