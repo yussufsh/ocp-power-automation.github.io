@@ -148,6 +148,13 @@ worker                      = {instance_type    = &quot;&lt;worker-compute-templ
 <p><code>instance_type</code> is the compute template to be used and <code>image_id</code> is the image UUID. <code>count</code> specifies the number of VMs that should be created for each type.</p>
 <p>You can optionally set worker <code>count</code> value to 0 in which case all the cluster pods will be running on the master/supervisor nodes. 
 Ensure you use proper sizing for master/supervisor nodes to avoid resource starvation for containers.</p>
+<p><code>availability_zone</code> is an optional attribute for bastion, bootstrap, master and worker. If it is specified, the VM will be created in the specified <code>availability_zone</code>, otherwise value of <code>openstack_availability_zone</code> will be used. </p>
+<pre><code>bastion                     = {instance_type    = &quot;&lt;bastion-compute-template&gt;&quot;, image_id    = &quot;&lt;image-uuid-rhel&gt;&quot;}
+bootstrap                   = {instance_type    = &quot;&lt;bootstrap-compute-template&gt;&quot;, image_id    = &quot;&lt;image-uuid-rhcos&gt;&quot;, availability_zone = &quot;&quot;, &quot;count&quot;   = 1}
+master                      = {instance_type    = &quot;&lt;master-compute-template&gt;&quot;, image_id    = &quot;&lt;image-uuid-rhcos&gt;&quot;, availability_zone = &quot;master-zone&quot;,  &quot;count&quot;   = 3}
+worker                      = {instance_type    = &quot;&lt;worker-compute-template&gt;&quot;, image_id    = &quot;&lt;image-uuid-rhcos&gt;&quot;, availability_zone = &quot;worker-zone&quot;,  &quot;count&quot;   = 2}
+</code></pre>
+<p>Above will create the bastion in <code>openstack_availability_zone</code>, bootstrap in default availability zone, masters in <code>master-zone</code>, and workers in <code>worker-zone</code>.</p>
 <p>To set a pre-defined IPv4 address for the bastion node, make use of the optional <code>fixed_ip_v4</code> in bastion variable as shown below. Ensure this address is within the given network subnet range and not already in use.</p>
 <pre><code>bastion                     = {instance_type    = &quot;&lt;bastion-compute-template&gt;&quot;, image_id    = &quot;&lt;image-uuid-rhel&gt;&quot;,  fixed_ip_v4 = &quot;&lt;IPv4 address&gt;&quot;}
 </code></pre>
@@ -191,7 +198,8 @@ cluster_id                  = &quot;&quot;
 <p>Set the <code>cluster_domain</code> to <code>nip.io</code>, <code>xip.io</code> or <code>sslip.io</code> if you prefer using online wildcard domains.
 Default is <code>ibm.com</code>.
 The <code>cluster_id_prefix</code> should not be more than 8 characters. Nodes are pre-fixed with this value.
-Default value is <code>test-ocp</code></p>
+Default value is <code>test-ocp</code>
+If <code>cluster_if_prefix</code> is not set, the <code>cluster_id</code> will be used only without prefix.</p>
 <p>A random value will be used for <code>cluster_id</code> if not set.
 The total length of <code>cluster_id_prefix</code>.<code>cluster_id</code> should not exceed 14 characters.</p>
 <h3 id="misc-customizations">Misc Customizations</h3>

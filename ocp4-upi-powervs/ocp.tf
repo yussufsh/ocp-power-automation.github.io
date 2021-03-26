@@ -12,7 +12,7 @@ resource "random_id" "label" {
 
 locals {
     # Generates cluster_id as combination of cluster_id_prefix + (random_id or user-defined cluster_id)
-    cluster_id      = var.cluster_id == "" ? random_id.label[0].hex : "${var.cluster_id_prefix}-${var.cluster_id}"
+    cluster_id      = var.cluster_id == "" ? random_id.label[0].hex : (var.cluster_id_prefix == "" ? var.cluster_id : "${var.cluster_id_prefix}-${var.cluster_id}")
     storage_type    = lookup(var.bastion, "count", 1) > 1 ? "none" : var.storage_type
 }
 
@@ -29,6 +29,7 @@ module "prepare" {
     network_name                    = var.network_name
     #Specify dns for public network. Trim spaces that may be present in splitted values.
     network_dns                     = var.dns_forwarders == "" ? [] : [for dns in split(";", var.dns_forwarders): trimspace(dns)]
+    bastion_health_status           = var.bastion_health_status
     rhel_username                   = var.rhel_username
     private_key                     = local.private_key
     public_key                      = local.public_key
@@ -122,4 +123,5 @@ module "install" {
     upgrade_delay_time              = var.upgrade_delay_time
     ibm_cloud_dl_endpoint_net_cidr  = var.ibm_cloud_dl_endpoint_net_cidr
     ibm_cloud_http_proxy            = var.ibm_cloud_http_proxy
+    cni_network_provider            = var.cni_network_provider
 }

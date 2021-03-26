@@ -129,13 +129,13 @@
 <p>If the latest Terraform is already present in the system PATH then the script will create a symbolic link in the current directory and use it. The script does not download the binary in this case.</p>
 <h3 id="download-the-artifacts">Download the artifacts</h3>
 <p>Downloads the Terraform artifacts which is used to create the OpenShift 4 cluster on PowerVS at IBM Cloud.</p>
-<p>The script uses environment variable ARTIFACTS_VERSION to download the <a href="https://github.com/ocp-power-automation/ocp4-upi-powervs">OCP on PowerVS</a> code. ARTIFACTS_VERSION can set to the branch or tag name eg: release-4.5, release-4.6 <em>(default)</em>, v4.5.1, etc.</p>
-<p>Another environment variable you can set is RELEASE_VER to the OpenShift version you want to install. eg: 4.5, 4.6 <em>(default)</em>, etc.</p>
+<p>The script uses environment variable ARTIFACTS_VERSION to download the <a href="https://github.com/ocp-power-automation/ocp4-upi-powervs">OCP on PowerVS</a> code. ARTIFACTS_VERSION can set to the branch or tag name eg: release-4.5, release-4.6, release-4.7 <em>(default)</em>, v4.5.1, etc.</p>
+<p>Another environment variable you can set is RELEASE_VER to the OpenShift version you want to install. eg: 4.5, 4.6, 4.7 <em>(default)</em>, etc.</p>
 <h2 id="usage">Usage</h2>
 <pre><code># openshift-install-powervs setup
 [setup] Installing dependency packages and tools
 [setup_tools] Verifying the latest packages and tools
-[setup_artifacts] Downloading code artifacts release-4.6 in ./automation
+[setup_artifacts] Downloading code artifacts release-4.7 in ./automation
 Attempt: 1/5
 [setup] SUCCESS: setup command completed!
 

@@ -212,6 +212,14 @@ ansible_extra_options              = &quot;-v&quot;
 <p>This variable specifies the external DNS servers to forward DNS queries that cannot be resolved locally.</p>
 <pre><code>dns_forwarders                     = &quot;1.1.1.1; 9.9.9.9&quot;
 </code></pre>
+<p>List of <a href="https://docs.openshift.com/container-platform/4.6/nodes/nodes/nodes-nodes-working.html#nodes-nodes-kernel-arguments_nodes-nodes-working">kernel arguments</a> for the cluster nodes.
+Note that this will be applied after the cluster is installed and all the nodes are in <code>Ready</code> status.</p>
+<pre><code>rhcos_kernel_options        = []
+</code></pre>
+<ul>
+<li>Example 1
+  <code>rhcos_kernel_options      = ["slub_max_order=0","loglevel=7"]</code></li>
+</ul>
 <p>These are NTP specific variables that are used for time-synchronization in the OpenShift cluster.</p>
 <pre><code>chrony_config                      = true
 chrony_config_servers              = [ {server = &quot;0.centos.pool.ntp.org&quot;, options = &quot;iburst&quot;}, {server = &quot;1.centos.pool.ntp.org&quot;, options = &quot;iburst&quot;} ]

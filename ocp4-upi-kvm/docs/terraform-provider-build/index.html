@@ -195,8 +195,8 @@ make build
 cd -
 
 # Create plugin directory and copy the binary
-mkdir -p $PLUGIN_PATH/registry.terraform.io/terraform-providers/ignition/$VERSION/$PLATFORM/
-cp $GOPATH/bin/terraform-provider-ignition $PLUGIN_PATH/registry.terraform.io/terraform-providers/ignition/$VERSION/$PLATFORM/terraform-provider-ignition
+mkdir -p $PLUGIN_PATH/registry.terraform.io/community-terraform-providers/ignition/$VERSION/$PLATFORM/
+cp $GOPATH/bin/terraform-provider-ignition $PLUGIN_PATH/registry.terraform.io/community-terraform-providers/ignition/$VERSION/$PLATFORM/terraform-provider-ignition
 </code></pre>
 <p><strong>terraform-provider-null</strong>: Please refer to the section below for instructions on installing the null provider plugin. For <a href="https://github.com/hashicorp/terraform-provider-null#building-the-provider">more information</a>.</p>
 <p>Note: Set <code>VERSION</code> to a compatible version eg. 2.1.2</p>

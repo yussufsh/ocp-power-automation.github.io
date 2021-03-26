@@ -150,6 +150,25 @@
 <h2 id="problems-on-a-running-cluster">Problems on a Running Cluster</h2>
 <h4 id="need-to-add-more-cpumemory-to-node">Need to add more CPU/Memory to Node</h4>
 <p>Go to <a href="https://cloud.ibm.com">https://cloud.ibm.com</a>, then to your PowerVS service instance, find your VM that backs the cluster Node (eg. myocp-worker-0), click to open up the details page, then "Edit details," update the CPU/Memory with new values, and Save. You should get "Edit successful" message, and your OCP cluster should recognize the change and start showing in Compute section of Web Console. If something fails along the way, try "OS Shutdown" action, edit CPU/Memory as necessary while in "Shutoff" state, and restart the VM.</p>
+<h4 id="workers-saturated-lets-have-masters-help">Workers saturated, Let's have Masters help</h4>
+<p>Follow the <a href="https://docs.openshift.com/container-platform/4.7/nodes/nodes/nodes-nodes-working.html#nodes-nodes-working-master-schedulable_nodes-nodes-working">standard OpenShift documentation</a> to make master nodes "Schedulable" first. Then, add the now-Schedulable master nodes as eligible backends for HAProxy on bastion node (<code>/etc/haproxy/haproxy.cfg</code>), followed by <code># systemctl restart haproxy</code>.</p>
+<pre><code class="language-text">backend ingress-http
+    balance source
+    server worker-0-http-router0 192.168.25.43:80 check
+    server worker-1-http-router1 192.168.25.157:80 check
+    server master-0-http-router0 192.168.25.195:80 check
+    server master-1-http-router1 192.168.25.148:80 check
+    server master-2-http-router2 192.168.25.8:80 check
+</code></pre>
+<pre><code class="language-text">backend ingress-https
+    balance source
+    server worker-0-https-router0 192.168.25.43:443 check
+    server worker-1-https-router1 192.168.25.157:443 check
+    server master-0-https-router0 192.168.25.195:443 check
+    server master-1-https-router1 192.168.25.148:443 check
+    server master-2-https-router2 192.168.25.8:443 check
+</code></pre>
+<p>Note: adjust the IP addresses per your setup.</p>
 <hr />
 <h2 id="securing-a-cluster">Securing a Cluster</h2>
 <h4 id="tba">TBA</h4>

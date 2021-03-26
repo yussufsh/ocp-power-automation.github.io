@@ -35,7 +35,7 @@ resource "random_id" "label" {
 
 locals {
     # Generates cluster_id as combination of cluster_id_prefix + (random_id or user-defined cluster_id)
-    cluster_id  = var.cluster_id == "" ? random_id.label[0].hex : "${var.cluster_id_prefix}-${var.cluster_id}"
+    cluster_id  = var.cluster_id == "" ? random_id.label[0].hex : (var.cluster_id_prefix == ""? var.cluster_id : "${var.cluster_id_prefix}-${var.cluster_id}")
 }
 
 module "bastion" {
@@ -70,6 +70,7 @@ module "bastion" {
 module "network" {
     source                          = "./modules/2_network"
 
+    bastion_ip                      = module.bastion.bastion_ip
     cluster_id                      = local.cluster_id
     network_name                    = var.network_name
     bootstrap_count                 = var.bootstrap["count"]
@@ -109,6 +110,7 @@ module "helpernode" {
     ansible_extra_options           = var.ansible_extra_options
     chrony_config                   = var.chrony_config
     chrony_config_servers           = var.chrony_config_servers
+    pull_secret                     = file(coalesce(var.pull_secret_file, "/dev/null"))
 }
 
 module "nodes" {

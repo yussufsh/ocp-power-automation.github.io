@@ -220,6 +220,16 @@ variable "ssh_agent" {
     default     = false
 }
 
+variable "bastion_health_status" {
+    type        = string
+    description = "Specify if bastion should poll for the Health Status to be OK or WARNING. Default is OK."
+    default     = "OK"
+    validation {
+        condition     = contains(["OK","WARNING"], var.bastion_health_status)
+        error_message = "The bastion_health_status value must be either OK or WARNING."
+    }
+}
+
 variable "installer_log_level" {
     type        = string
     description = "Set the log level required for openshift-install commands"
@@ -251,7 +261,7 @@ variable "install_playbook_tag" {
     type        = string
     description = "Set the branch/tag name or commit# for using ocp4-playbooks repo"
     # Checkout level for https://github.com/ocp-power-automation/ocp4-playbooks which is used for running ocp4 installations steps
-    default     = "fc74d7ec06b2dd47c134c50b66b478abde32e295"
+    default     = "592e51671ff2762718955fb2a0541a5b19c862e9"
 }
 
 variable "ansible_extra_options" {
@@ -453,6 +463,11 @@ variable "upgrade_delay_time" {
     type        = string
     description = "Number of seconds to wait before re-checking the upgrade status once the playbook execution resumes."
     default     = "600"
+}
+
+variable "cni_network_provider" {
+    description = "Set the default Container Network Interface (CNI) network provider"
+    default     = "OpenshiftSDN"
 }
 
 ################################################################

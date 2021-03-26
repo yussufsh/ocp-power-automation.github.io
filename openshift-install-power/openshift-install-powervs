@@ -13,7 +13,7 @@ limitations under the License.
 '
 #-------------------------------------------------------------------------
 set -e
-VERSION="v1.0.4"
+VERSION="v1.1.1"
 
 #-------------------------------------------------------------------------
 # Display help
@@ -47,7 +47,7 @@ Where <args>:
 
 Environment Variables:
   IBMCLOUD_API_KEY    IBM Cloud API key
-  RELEASE_VER         OpenShift release version (Default: 4.6)
+  RELEASE_VER         OpenShift release version (Default: 4.7)
   ARTIFACTS_VERSION   Tag or Branch name of ocp4-upi-powervs repository (Default: release-<RELEASE_VER>)
   RHEL_SUBS_PASSWORD  RHEL subscription password if not provided in variables
   NO_OF_RETRY         Number of retries/attempts to run repeatable actions such as create (Default: 5)
@@ -58,7 +58,7 @@ EOF
   exit 0
 }
 
-RELEASE_VER=${RELEASE_VER:-"4.6"}
+RELEASE_VER=${RELEASE_VER:-"4.7"}
 ARTIFACTS_REPO=${ARTIFACTS_REPO:-"https://github.com/ocp-power-automation/ocp4-upi-powervs"}
 ARTIFACTS_VERSION=${ARTIFACTS_VERSION:-"release-$RELEASE_VER"}
 #ARTIFACTS_VERSION="v4.5.3"
@@ -84,6 +84,9 @@ REBOOT_TIMEOUT=30
 BOOTSTRAP_DELETE_VARFILE="bootstrap-delete.tfvars"
 
 OLD_IFS=$IFS
+
+# All the ibmcloud configs and targeted power-iaas CRN will be stored under current directory named '.bluemix'
+export IBMCLOUD_HOME="$PWD"
 
 #-------------------------------------------------------------------------
 # Trap ctrl-c interrupt and call ctrl_c()
@@ -530,7 +533,7 @@ function retry_terraform {
       elif [[ $action == "apply" ]] && [[ ! -f "$BOOTSTRAP_DELETE_VARFILE" ]]; then
         log "Deleting the bootstrap node... please wait"
         # Create the bootstrap delete var file
-        echo "bootstrap = {count = 0}" > "$BOOTSTRAP_DELETE_VARFILE"
+        echo "bootstrap = {count = 0, memory = \"32\", processors = \"0.5\"}" > "$BOOTSTRAP_DELETE_VARFILE"
         # Restart the loop for re-apply to delete the bootstrap node
         action="delete_bootstrap"
         cmd="$cmd -var-file $BOOTSTRAP_DELETE_VARFILE"
@@ -549,7 +552,11 @@ function retry_terraform {
 #-------------------------------------------------------------------------
 function init_terraform {
   log "Initializing Terraform plugins and validating the code..."
-  retry "$TF init" > /dev/null
+  if [[ "$ARCH" == "ppc64le" ]]; then
+    retry "$TF init --plugin-dir ../" > /dev/null
+  else
+    retry "$TF init" > /dev/null
+  fi
   $TF validate > /dev/null
 }
 
@@ -645,7 +652,12 @@ function precheck_tools {
     warn "Cannot find artifacts directory... running setup command"
     setup
   else
-    setup_tools
+    # Check if the artifact version matches the RELEASE_VER
+    if grep -F openshift_install_tarball $ARTIFACTS_DIR/var.tfvars | grep -q $RELEASE_VER; then
+      setup_tools
+    else
+      error "The Environment variable RELEASE_VER=$RELEASE_VER does not match the downloaded artifact version. Please run the setup command again if you are trying a different version."
+    fi
   fi
 }
 
@@ -1081,12 +1093,26 @@ function setup_terraform {
     return
   else
     log "Installing the latest version of Terraform..."
-    retry "curl --connect-timeout 30 -fsSL https://releases.hashicorp.com/terraform/${TF_LATEST:1}/terraform_${TF_LATEST:1}_${OS}_amd64.zip -o ./terraform.zip"
-    unzip -o ./terraform.zip  >/dev/null 2>&1
-    rm -f ./terraform.zip
+    if [[ "${ARCH}" == "ppc64le" ]]; then
+      retry "curl --connect-timeout 30 -fsSL https://oplab9.parqtec.unicamp.br/pub/ppc64el/terraform/terraform-${TF_LATEST:1} -o ${TF}"
+    else
+      retry "curl --connect-timeout 30 -fsSL https://releases.hashicorp.com/terraform/${TF_LATEST:1}/terraform_${TF_LATEST:1}_${OS}_amd64.zip -o ./terraform.zip"
+      unzip -o ./terraform.zip  >/dev/null 2>&1
+      rm -f ./terraform.zip
+    fi
     chmod +x $TF
   fi
   $TF version | grep "Terraform v" 
+}
+
+#-------------------------------------------------------------------------
+# Install latest terraform providers for ppc64le
+#-------------------------------------------------------------------------
+function setup_terraform_providers {
+  TF_PPC64LE_PROVIDERS="v0.7"
+  retry "curl -fsSL https://github.com/ocp-power-automation/terraform-providers-power/releases/download/$TF_PPC64LE_PROVIDERS/archive.zip -o archive.zip"
+  unzip -o "./archive.zip" >/dev/null 2>&1
+  rm -f "./archive.zip"
 }
 
 #-------------------------------------------------------------------------
@@ -1138,7 +1164,7 @@ function setup_ibmcloudcli() {
 #-------------------------------------------------------------------------
 function setup_occli() {
 
-  OC_BASE_URL="https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable-${RELEASE_VER}"
+  OC_BASE_URL="https://mirror.openshift.com/pub/openshift-v4/${ARCH}/clients/ocp/stable-${RELEASE_VER}"
   OC_DOWNLOAD_URL="${OC_BASE_URL}/openshift-client-${OC_CLI_OS}.${ARCHIVE_TYPE}"
 
   EXT_PATH=$(which oc 2> /dev/null || true)
@@ -1181,6 +1207,9 @@ function setup_tools() {
   setup_ibmcloudcli
   setup_poweriaas
   setup_terraform
+  if [[ "${ARCH}" == "ppc64le" ]]; then
+    setup_terraform_providers
+  fi
   setup_occli
 }
 
@@ -1308,9 +1337,10 @@ function process_varfile {
 # Perform platform checks
 #-------------------------------------------------------------------------
 function platform_checks {
-  if [[ $(uname -m) != "x86_64" ]]; then
-    warn "Only 64-bit x86 machines are supported"
-    error "Unsupported machine: $(uname -m)" 1
+  ARCH=`uname -m`
+  if [[ "${ARCH}" != "x86_64" ]] && [[ "${ARCH}" != "ppc64le" ]]; then
+    warn "Only 64-bit x86 and Power machines are supported"
+    error "Unsupported machine: ${ARCH}" 1
   fi
   PLATFORM=$(uname)
   case "$PLATFORM" in
@@ -1343,7 +1373,11 @@ function platform_checks {
         PACKAGE_MANAGER="$SUDO yum"
       fi
       OS="linux"
-      IBM_CLI_OS="linux64"
+      if [[ "$ARCH" == "ppc64le" ]]; then
+        IBM_CLI_OS="ppc64le"
+      else
+        IBM_CLI_OS="linux64"
+      fi
       OC_CLI_OS="$OS"
       ARCHIVE_TYPE="tar.gz"
       ;;

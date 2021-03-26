@@ -108,7 +108,6 @@ module "prepare" {
 }
 
 module "helpernode" {
-    depends_on                      = [module.prepare]
     source                          = "./modules/3_helpernode"
 
     cluster_domain                  = var.cluster_domain
@@ -137,10 +136,11 @@ module "helpernode" {
     local_registry_image            = var.local_registry_image
     ocp_release_tag                 = var.ocp_release_tag
     ansible_extra_options           = var.ansible_extra_options
+    pull_secret                     = file(coalesce(var.pull_secret_file, "/dev/null"))
 }
 
 module "nodes" {
-    depends_on                      = [module.helpernode]
+    depends_on                      = [module.prepare]
     source                          = "./modules/4_nodes"
 
     bastion_ip                      = module.prepare.bastion_ip
@@ -160,7 +160,7 @@ module "nodes" {
 }
 
 module "install" {
-    depends_on                      = [module.nodes]
+    depends_on                      = [module.helpernode, module.nodes]
     source                          = "./modules/5_install"
 
     cluster_domain                  = var.cluster_domain
@@ -185,6 +185,7 @@ module "install" {
     install_playbook_tag            = var.install_playbook_tag
     log_level                       = var.installer_log_level
     ansible_extra_options           = var.ansible_extra_options
+    rhcos_kernel_options            = var.rhcos_kernel_options
     upgrade_version                 = var.upgrade_version
     upgrade_channel                 = var.upgrade_channel
     upgrade_pause_time              = var.upgrade_pause_time

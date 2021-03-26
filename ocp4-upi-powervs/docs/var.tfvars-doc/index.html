@@ -284,7 +284,8 @@ cluster_id                  = &quot;&quot;
 <p>Set the <code>cluster_domain</code> to <code>nip.io</code>, <code>xip.io</code> or <code>sslip.io</code> if you prefer using online wildcard domains.
 Default is <code>ibm.com</code>.
 The <code>cluster_id_prefix</code> should not be more than 8 characters. Nodes are pre-fixed with this value.
-Default value is <code>test-ocp</code></p>
+Default value is <code>test-ocp</code>
+If <code>cluster_id_prefix</code> is not set, the <code>cluster_id</code> will be used only without prefix.</p>
 <p>A random value will be used for <code>cluster_id</code> if not set.
 The total length of <code>cluster_id_prefix</code>.<code>cluster_id</code> should not exceed 14 characters.</p>
 <h3 id="misc-customizations">Misc Customizations</h3>
@@ -303,6 +304,9 @@ ocp_release_name           = &quot;ocp-release&quot;
 helpernode_tag             = &quot;5eab3db53976bb16be582f2edc2de02f7510050d&quot;
 install_playbook_repo      = &quot;https://github.com/ocp-power-automation/ocp4-playbooks&quot;
 install_playbook_tag       = &quot;02a598faa332aa2c3d53e8edd0e840440ff74bd5&quot;
+</code></pre>
+<p>This variable specify if bastion should poll for the Health Status to be OK or WARNING. Default is OK.</p>
+<pre><code>bastion_health_status       = &quot;OK&quot;
 </code></pre>
 <p>These variables can be used when debugging ansible playbooks.</p>
 <pre><code>installer_log_level         = &quot;info&quot;
@@ -353,6 +357,9 @@ upgrade_delay_time = &quot;600&quot;
 <p>The following variables are specific to enable the connectivity between OCP nodes in PowerVS and IBM Cloud infrastructure over DirectLink.</p>
 <pre><code>ibm_cloud_dl_endpoint_net_cidr = &quot;&quot;
 ibm_cloud_http_proxy = &quot;&quot;
+</code></pre>
+<p>This variable is used to set the default Container Network Interface (CNI) network provider such as OpenShiftSDN or OVNKubernetes</p>
+<pre><code>cni_network_provider       = &quot;OpenshiftSDN&quot;
 </code></pre>
               
             </div>

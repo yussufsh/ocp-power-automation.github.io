@@ -39,8 +39,8 @@ openshift_client_tarball    = "https://mirror.openshift.com/pub/openshift-v4/ppc
 pull_secret_file            = "data/pull-secret.txt"
 
 cluster_domain              = "ibm.com"  #Set domain to nip.io or xip.io if you prefer using online wildcard domain and avoid modifying /etc/hosts
-cluster_id_prefix           = "test-ocp"
-cluster_id                  = ""
+cluster_id_prefix           = "test-ocp" # Set it to empty if just want to use cluster_id without prefix
+cluster_id                  = ""         # It will use random generated id with cluster_id_prefix if this is not set
 
 
 ### Misc Customizations
@@ -57,6 +57,7 @@ cluster_id                  = ""
 #install_playbook_repo      = "https://github.com/ocp-power-automation/ocp4-playbooks"
 #install_playbook_tag       = ""
 
+#bastion_health_status      = "OK"
 #installer_log_level        = "info"
 #ansible_extra_options      = "-v"
 #ansible_repo_name          = "ansible-2.9-for-rhel-8-ppc64le-rpms"
@@ -85,3 +86,5 @@ cluster_id                  = ""
 
 #ibm_cloud_dl_endpoint_net_cidr = ""  #Set this to IBM Cloud DirectLink endpoint network cidr eg. 10.0.0.0/8
 #ibm_cloud_http_proxy = ""            #Set this to IBM Cloud http/squid proxy eg. http://10.166.13.64:3128
+
+#cni_network_provider       = "OpenshiftSDN"
